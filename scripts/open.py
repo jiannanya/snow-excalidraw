@@ -96,16 +96,54 @@ def render_animation(excalidraw_path: Path, animseq_path: Path | None, dest: Pat
     return None
 
 
+def build_standalone_html(diagram_path: Path) -> str:
+    """Build a standalone HTML file with the diagram bundle embedded inline.
+
+    Replaces the hash-based bundle loader in audit.html with a Promise that
+    resolves immediately to the embedded diagram JSON, so the file works
+    directly as a file:// URL without needing a URL fragment.
+    """
+    audit_html_path = Path(__file__).parent.parent / "sites" / "audit.html"
+    audit_html = audit_html_path.read_text(encoding="utf-8")
+    diagram_data = load_diagram(diagram_path)
+    diagram_json = json.dumps(diagram_data, separators=(",", ":"))
+
+    # Replace the hash-based __snowBundle assignment with an inline Promise.
+    # The pre-flight .then() callback still runs; it finds no error and arms
+    # the CDN watchdog, which the module clears on successful import.
+    old_loader = (
+        "// Store decoded data for the module script to pick up\n"
+        "window.__snowBundle = (async function() {\n"
+        "  const hash = location.hash.slice(1);\n"
+        "  if (!hash) return { error: 'no-hash' };\n"
+        "  try {\n"
+        "    return { bundle: await decodeBundle(hash) };\n"
+        "  } catch (e) {\n"
+        "    return { error: e.message };\n"
+        "  }\n"
+        "})();"
+    )
+    new_loader = (
+        "// Inline bundle \u2014 diagram data embedded by open.py --mode html-preview\n"
+        f"window.__snowBundle = Promise.resolve({{ bundle: {diagram_json} }});"
+    )
+    return audit_html.replace(old_loader, new_loader)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Snow-Excalidraw diagram launcher")
     parser.add_argument("diagram", help="Path to .excalidraw file")
     parser.add_argument(
         "--mode",
-        choices=["edit", "animate", "save-excalidraw", "save-image", "open-image", "save-animation"],
-        default="edit",
-        help="Delivery mode",
+        choices=["html-preview", "edit", "animate", "save-excalidraw", "save-image", "open-image", "save-animation"],
+        default="html-preview",
+        help="Delivery mode (default: html-preview)",
     )
     parser.add_argument("--dest", help="Destination directory for save modes")
+    parser.add_argument(
+        "--e2e", action="store_true",
+        help="Run end-to-end browser validation after generating html-preview",
+    )
     args = parser.parse_args()
 
     diagram_path = Path(args.diagram)
@@ -123,7 +161,24 @@ def main() -> None:
 
     mode = args.mode
 
-    if mode == "edit":
+    if mode == "html-preview":
+        standalone_html = build_standalone_html(diagram_path)
+        preview_path = diagram_dir / (diagram_path.stem + "-preview.html")
+        preview_path.write_text(standalone_html, encoding="utf-8")
+        print(f"Preview  : {preview_path}")
+        print(f"URL      : {preview_path.as_uri()}")
+        open_in_browser(preview_path)
+        if args.e2e:
+            e2e_script = Path(__file__).parent / "e2e_test.py"
+            result = subprocess.run(
+                ["uv", "run", "python", str(e2e_script), str(preview_path)],
+                text=True,
+            )
+            if result.returncode != 0:
+                print("E2E test FAILED \u2014 review errors above.", file=sys.stderr)
+                sys.exit(result.returncode)
+
+    elif mode == "edit":
         url = build_local_audit_url(diagram_path, animseq_path)
         launcher = diagram_dir / "launch-edit.html"
         write_launcher(url, launcher, "Snow-Excalidraw — Edit Diagram")

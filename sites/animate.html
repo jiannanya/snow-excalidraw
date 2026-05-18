@@ -156,12 +156,61 @@ window.__snowReady = (async function() {
     return { error: e.message };
   }
 })();
+
+// ── Pre-flight: surface errors without waiting for ESM CDN ───────────────────
+window.__seModuleMounted = false;
+
+function showOverlayError(html) {
+  var el = document.getElementById('overlay');
+  if (el) el.innerHTML = html;
+}
+
+window.__snowReady.then(function(result) {
+  if (result.error === 'no-hash') {
+    showOverlayError(
+      '<div class="se-error"><h2>No animation data</h2>' +
+      '<p>Generate a preview with:<br>' +
+      '<code>uv run python open.py diagram.excalidraw --mode animate</code></p>' +
+      '</div>'
+    );
+    return;
+  }
+  window.__seCdnWatchdog = setTimeout(function() {
+    if (!window.__seModuleMounted) {
+      showOverlayError(
+        '<div class="se-error"><h2>CDN load timed out</h2>' +
+        '<p>Could not load Excalidraw from <code>esm.sh</code> after 20 s.</p>' +
+        '<ul style="text-align:left;margin-top:.5rem;font-size:.85rem;color:#495057">' +
+        '<li>Check your internet connection and reload.</li>' +
+        '<li>Or open <a href="https://excalidraw.com" target="_blank">excalidraw.com</a> directly.</li>' +
+        '</ul></div>'
+      );
+    }
+  }, 20000);
+});
+
+window.addEventListener('unhandledrejection', function(ev) {
+  if (window.__seModuleMounted) return;
+  clearTimeout(window.__seCdnWatchdog);
+  var msg = ev.reason && (ev.reason.message || String(ev.reason)) || 'unknown error';
+  showOverlayError(
+    '<div class="se-error"><h2>Module load error</h2>' +
+    '<p>' + msg + '</p>' +
+    '<p style="margin-top:.5rem">Check internet connection or open ' +
+    '<a href="https://excalidraw.com" target="_blank">excalidraw.com</a> directly.</p>' +
+    '</div>'
+  );
+});
 </script>
 
 <script type="module">
 import React         from 'react';
 import { createRoot } from 'react-dom/client';
 import { Excalidraw } from '@excalidraw/excalidraw';
+
+// Signal to pre-flight watchdog that ESM imports succeeded.
+window.__seModuleMounted = true;
+clearTimeout(window.__seCdnWatchdog);
 
 const { bundle, error } = await window.__snowReady;
 
