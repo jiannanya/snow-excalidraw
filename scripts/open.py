@@ -124,10 +124,41 @@ def build_standalone_html(diagram_path: Path) -> str:
         "})();"
     )
     new_loader = (
-        "// Inline bundle \u2014 diagram data embedded by open.py --mode html-preview\n"
+        "// Inline bundle \u2014 diagram data embedded by open.py\n"
         f"window.__snowBundle = Promise.resolve({{ bundle: {diagram_json} }});"
     )
     return audit_html.replace(old_loader, new_loader)
+
+
+def build_standalone_animate_html(diagram_path: Path, animseq_path: Path | None) -> str:
+    """Build a standalone animate HTML with diagram + animseq data embedded inline."""
+    animate_html_path = Path(__file__).parent.parent / "sites" / "animate.html"
+    animate_html = animate_html_path.read_text(encoding="utf-8")
+    diagram_data = load_diagram(diagram_path)
+    animseq_data = json.loads(animseq_path.read_text(encoding="utf-8")) if animseq_path else None
+
+    bundle: dict = {"diagram": diagram_data}
+    if animseq_data is not None:
+        bundle["animation"] = animseq_data
+    bundle_json = json.dumps(bundle, separators=(",", ":"))
+
+    old_loader = (
+        "// Decode and expose for module script\n"
+        "window.__snowReady = (async function() {\n"
+        "  const hash = location.hash.slice(1);\n"
+        "  if (!hash) return { error: 'no-hash' };\n"
+        "  try {\n"
+        "    return { bundle: await decodeBundle(hash) };\n"
+        "  } catch (e) {\n"
+        "    return { error: e.message };\n"
+        "  }\n"
+        "})();"
+    )
+    new_loader = (
+        "// Inline bundle \u2014 diagram data embedded by open.py\n"
+        f"window.__snowReady = Promise.resolve({{ bundle: {bundle_json} }});"
+    )
+    return animate_html.replace(old_loader, new_loader)
 
 
 def main() -> None:
@@ -179,18 +210,19 @@ def main() -> None:
                 sys.exit(result.returncode)
 
     elif mode == "edit":
-        url = build_local_audit_url(diagram_path, animseq_path)
+        standalone_html = build_standalone_html(diagram_path)
         launcher = diagram_dir / "launch-edit.html"
-        write_launcher(url, launcher, "Snow-Excalidraw — Edit Diagram")
+        launcher.write_text(standalone_html, encoding="utf-8")
         print(f"Launcher : {launcher}")
-        print(f"Viewer   : {url[:80]}…")
+        print(f"URL      : {launcher.as_uri()}")
         open_in_browser(launcher)
 
     elif mode == "animate":
-        url = build_local_animate_url(diagram_path, animseq_path)
+        standalone_html = build_standalone_animate_html(diagram_path, animseq_path)
         launcher = diagram_dir / "launch-animate.html"
-        write_launcher(url, launcher, "Snow-Excalidraw — Animated Diagram")
+        launcher.write_text(standalone_html, encoding="utf-8")
         print(f"Launcher : {launcher}")
+        print(f"URL      : {launcher.as_uri()}")
         open_in_browser(launcher)
 
     elif mode == "save-excalidraw":
@@ -207,9 +239,9 @@ def main() -> None:
         if result:
             print(f"Saved: {result}")
         else:
-            url = build_local_audit_url(diagram_path, animseq_path)
+            standalone_html = build_standalone_html(diagram_path)
             launcher = diagram_dir / "launch-edit.html"
-            write_launcher(url, launcher, "Snow-Excalidraw — Export Image")
+            launcher.write_text(standalone_html, encoding="utf-8")
             print(f"PNG unavailable. Open editor to export: {launcher}")
             open_in_browser(launcher)
 
@@ -219,9 +251,9 @@ def main() -> None:
             print(f"Saved: {result}")
             open_with_system(result)
         else:
-            url = build_local_audit_url(diagram_path, animseq_path)
+            standalone_html = build_standalone_html(diagram_path)
             launcher = diagram_dir / "launch-edit.html"
-            write_launcher(url, launcher, "Snow-Excalidraw — Export Image")
+            launcher.write_text(standalone_html, encoding="utf-8")
             print(f"PNG unavailable. Open editor to export: {launcher}")
             open_in_browser(launcher)
 
@@ -230,9 +262,9 @@ def main() -> None:
         if result:
             print(f"Saved: {result}")
         else:
-            url = build_local_animate_url(diagram_path, animseq_path)
+            standalone_html = build_standalone_animate_html(diagram_path, animseq_path)
             launcher = diagram_dir / "launch-animate.html"
-            write_launcher(url, launcher, "Snow-Excalidraw — Animated Diagram")
+            launcher.write_text(standalone_html, encoding="utf-8")
             print(f"Animation unavailable. View at: {launcher}")
             open_in_browser(launcher)
 

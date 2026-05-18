@@ -1,2 +1,4 @@
 doc/
 .vscode/
+tmp/
+__pycache__/
