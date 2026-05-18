@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snow-Excalidraw — Viewer Hub</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; color: #1e1e2e;
+           background: #f8f9fa; min-height: 100vh; padding: 2rem 1rem; }
+    .hub { max-width: 720px; margin: 0 auto; }
+    .logo { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: .25rem; }
+    .logo span { color: #339af0; }
+    .tagline { color: #868e96; font-size: .95rem; margin-bottom: 2.5rem; }
+    h2 { font-size: 1rem; font-weight: 600; text-transform: uppercase;
+         letter-spacing: .06em; color: #868e96; margin: 2rem 0 1rem; }
+    .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .card { background: #fff; border: 1px solid #dee2e6; border-radius: 10px;
+            padding: 1.25rem 1.5rem; text-decoration: none; color: inherit;
+            transition: border-color .15s, box-shadow .15s; display: block; }
+    .card:hover { border-color: #339af0; box-shadow: 0 0 0 3px rgba(51,154,240,.15); }
+    .card-title { font-weight: 600; font-size: 1.05rem; margin-bottom: .35rem; }
+    .card-desc  { font-size: .875rem; color: #868e96; line-height: 1.5; }
+    .cmd-block { background: #1e1e2e; color: #cdd6f4; border-radius: 8px;
+                 padding: 1rem 1.25rem; font: 13px/1.7 'Cascadia Code','Fira Code',monospace;
+                 overflow-x: auto; margin: .75rem 0; }
+    .cmd-block .cmt { color: #6c7086; }
+    .pill { display: inline-block; background: #e7f5ff; color: #1971c2;
+            border-radius: 4px; font-size: .75rem; padding: .15rem .45rem;
+            font-family: monospace; margin: .1rem .1rem 0 0; }
+    hr { border: none; border-top: 1px solid #dee2e6; margin: 2.5rem 0; }
+    footer { font-size: .8rem; color: #adb5bd; text-align: center; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+<div class="hub">
+
+  <div class="logo">Snow-<span>Excalidraw</span></div>
+  <p class="tagline">AI-powered hand-drawn diagram generator · local viewer pages</p>
+
+  <h2>Open a diagram</h2>
+  <p style="font-size:.9rem;color:#495057;margin-bottom:1rem">
+    These pages decode a diagram bundle from the URL hash and render it locally.
+    Run <code>open.py</code> to generate the URL automatically:
+  </p>
+  <div class="cmd-block">
+    <span class="cmt"># open in full editor</span><br>
+    uv run python open.py diagram.excalidraw --mode edit<br><br>
+    <span class="cmt"># open animation player</span><br>
+    uv run python open.py diagram.excalidraw --mode animate
+  </div>
+
+  <div class="card-row">
+    <a class="card" href="audit.html">
+      <div class="card-title">✏️ Edit Viewer</div>
+      <div class="card-desc">Opens the full Excalidraw editor with your diagram pre-loaded. Supports export, theme switch, and drawing.</div>
+    </a>
+    <a class="card" href="animate.html">
+      <div class="card-title">▶ Animation Player</div>
+      <div class="card-desc">Step-by-step animation player driven by an <code>.animseq.json</code> file. Play, pause, rewind, adjust speed.</div>
+    </a>
+  </div>
+
+  <hr>
+  <h2>Supported diagram types</h2>
+  <p style="font-size:.875rem;color:#495057;margin-bottom:.75rem">
+    Tell the AI what you need — it picks the right template automatically.
+  </p>
+  <div>
+    <span class="pill">System Design</span>
+    <span class="pill">Data Flow</span>
+    <span class="pill">Product Journey</span>
+    <span class="pill">Concept Web</span>
+    <span class="pill">Org Structure</span>
+    <span class="pill">Timeline View</span>
+    <span class="pill">Comparison Frame</span>
+    <span class="pill">Wireframe Kit</span>
+    <span class="pill">Narrative Flow</span>
+    <span class="pill">Sequence Diagram</span>
+    <span class="pill">ER Diagram</span>
+    <span class="pill">Kanban Board</span>
+    <span class="pill">Sales Funnel</span>
+  </div>
+
+  <hr>
+  <h2>Requirements</h2>
+  <div class="cmd-block">
+    <span class="cmt"># Python 3.11+ with uv</span><br>
+    uv pip install playwright<br>
+    playwright install chromium<br><br>
+    <span class="cmt"># The viewer pages require an internet connection</span><br>
+    <span class="cmt"># to load Excalidraw from CDN (esm.sh)</span>
+  </div>
+
+  <footer>Snow-Excalidraw skill · sites/index.html</footer>
+</div>
+</body>
+</html>

@@ -2,88 +2,86 @@
 """
 render.py — PNG renderer for Snow-Excalidraw diagrams.
 
-Attempts to render a .excalidraw file to PNG using available methods:
-1. Chrome DevTools MCP (via npx chrome-devtools-mcp) — preferred
-2. Playwright — fallback if Chrome DevTools MCP unavailable
+Loads the diagram in a headless Chromium browser via the local sites/audit.html
+viewer (served by local_render_server.py) and screenshots the Excalidraw canvas.
+
+Requirements:
+    uv pip install playwright
+    playwright install chromium
 
 Usage:
     uv run python render.py /path/to/diagram.excalidraw /path/to/output.png
+    uv run python render.py /path/to/diagram.excalidraw /path/to/output.png --timeout 45
 """
 
+import argparse
+import asyncio
 import json
-import subprocess
 import sys
-import tempfile
-import gzip
-import base64
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from scene_bundle import bundle_from_files
+from local_render_server import RenderServer
 
-def encode_scene(data: dict) -> str:
-    raw = json.dumps(data, separators=(",", ":")).encode("utf-8")
-    compressed = gzip.compress(raw)
-    return base64.urlsafe_b64encode(compressed).decode("ascii")
+# Selector that becomes visible once Excalidraw has mounted and painted its canvas
+_CANVAS_SELECTOR = ".excalidraw canvas"
+# Extra settle time (ms) after the canvas appears — lets fonts and shapes finish rendering
+_SETTLE_MS = 2500
 
 
-def render_via_playwright(excalidraw_path: Path, output_path: Path) -> bool:
-    """Render using Playwright headless browser."""
-    data = json.loads(excalidraw_path.read_text(encoding="utf-8"))
-    encoded = encode_scene(data)
-    edit_url = f"https://excalidraw.com/#json={encoded}"
+async def _render_async(excalidraw_path: Path, output_path: Path, timeout_s: int) -> bool:
+    from playwright.async_api import async_playwright
 
-    script = f"""
-import asyncio
-from playwright.async_api import async_playwright
+    encoded = bundle_from_files(excalidraw_path)
 
-async def render():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page(viewport={{"width": 1600, "height": 900}})
-        await page.goto({json.dumps(edit_url)}, wait_until="networkidle", timeout=30000)
-        await page.wait_for_timeout(3000)  # wait for canvas render
-        await page.screenshot(path={json.dumps(str(output_path))}, full_page=False)
-        await browser.close()
-        print(f"Rendered: {json.dumps(str(output_path))}")
+    with RenderServer() as srv:
+        url = srv.edit_url(encoded)
 
-asyncio.run(render())
-"""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
-        f.write(script)
-        script_path = f.name
+        async with async_playwright() as pw:
+            browser = await pw.chromium.launch(args=["--no-sandbox"])
+            page = await browser.new_page(viewport={"width": 1800, "height": 1000})
 
-    try:
-        result = subprocess.run(
-            ["python", script_path],
-            capture_output=True, text=True, timeout=60
-        )
-        return result.returncode == 0 and output_path.exists()
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        return False
-    finally:
-        Path(script_path).unlink(missing_ok=True)
+            try:
+                await page.goto(url, wait_until="domcontentloaded",
+                                timeout=timeout_s * 1000)
+                # Wait for the canvas element — indicates Excalidraw has mounted
+                await page.wait_for_selector(_CANVAS_SELECTOR,
+                                             timeout=timeout_s * 1000)
+                await page.wait_for_timeout(_SETTLE_MS)
+
+                # Attempt to export via Excalidraw's own exportToSvg JS API; fall
+                # back to a full-page screenshot if the API is unavailable.
+                canvas = await page.query_selector(_CANVAS_SELECTOR)
+                if canvas:
+                    await canvas.screenshot(path=str(output_path))
+                else:
+                    await page.screenshot(path=str(output_path), full_page=False)
+
+                print(f"Rendered : {output_path}")
+                return True
+
+            except Exception as exc:
+                print(f"Playwright render error: {exc}", file=sys.stderr)
+                return False
+            finally:
+                await browser.close()
+
+
+def render(excalidraw_path: Path, output_path: Path, timeout_s: int = 40) -> bool:
+    return asyncio.run(_render_async(excalidraw_path, output_path, timeout_s))
 
 
 def main() -> None:
-    if len(sys.argv) < 3:
-        print("Usage: uv run python render.py /path/to/diagram.excalidraw /path/to/output.png")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Snow-Excalidraw PNG renderer")
+    parser.add_argument("diagram", help="Path to .excalidraw file")
+    parser.add_argument("output",  help="Output PNG path")
+    parser.add_argument("--timeout", type=int, default=40,
+                        help="Timeout in seconds (default: 40)")
+    args = parser.parse_args()
 
-    excalidraw_path = Path(sys.argv[1])
-    output_path = Path(sys.argv[2])
-
-    if not excalidraw_path.exists():
-        print(f"Error: file not found: {excalidraw_path}", file=sys.stderr)
-        sys.exit(1)
-
-    print(f"Rendering {excalidraw_path} → {output_path}")
-
-    # Try Playwright
-    if render_via_playwright(excalidraw_path, output_path):
-        print(f"Saved: {output_path}")
-        sys.exit(0)
-
-    print("All render methods failed. Open in Excalidraw editor and use File → Export Image.")
-    sys.exit(1)
+    ok = render(Path(args.diagram), Path(args.output), timeout_s=args.timeout)
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

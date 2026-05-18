@@ -18,6 +18,9 @@ This skill activates when a user asks for:
 - A diagram, chart, map, or visual representation
 - System architecture, data flow, user journey, or org chart
 - Comparison, timeline, wireframe, or concept visualization
+- UML sequence diagram, entity relationship diagram, database schema
+- Kanban board, sprint board, task tracking
+- Sales funnel, conversion funnel, marketing stages
 - Any output containing shapes, arrows, or canvas elements
 
 ---
@@ -91,6 +94,10 @@ For multi-diagram projects, use descriptive names: `auth-flow.excalidraw`, `over
 | Comparison Frame | clean |
 | Wireframe Kit | clean |
 | Narrative Flow | sketch |
+| Sequence Diagram | clean |
+| ER Diagram | clean |
+| Kanban Board | clean |
+| Sales Funnel | clean |
 
 User keywords `"sketch"`, `"blueprint"`, `"clean"`, `"dark"` override defaults.
 

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snow-Excalidraw — Editor</title>
+  <!-- Excalidraw stylesheet loaded from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    #root { width: 100%; height: 100%; }
+
+    /* Loading / error overlay */
+    .se-overlay {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; background: #fff;
+      z-index: 9999; gap: .75rem; font-family: system-ui, sans-serif;
+    }
+    .se-spinner {
+      width: 36px; height: 36px; border: 3px solid #e9ecef;
+      border-top-color: #339af0; border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .se-label { color: #868e96; font-size: 15px; }
+
+    .se-error { text-align: center; padding: 2rem; max-width: 560px; }
+    .se-error h2 { color: #c92a2a; margin-bottom: .75rem; font-size: 1.1rem; }
+    .se-error p  { color: #495057; font-size: .9rem; line-height: 1.6; }
+    .se-error pre {
+      font-size: 11px; background: #f8f9fa; padding: .75rem; border-radius: 6px;
+      text-align: left; white-space: pre-wrap; word-break: break-all;
+      margin-top: .75rem; border: 1px solid #dee2e6;
+    }
+    .se-btn {
+      display: inline-block; margin-top: .9rem; padding: .5rem 1.2rem;
+      background: #339af0; color: #fff; border-radius: 6px;
+      text-decoration: none; font-size: 14px; cursor: pointer; border: none;
+    }
+    .se-btn:hover { background: #228be6; }
+  </style>
+
+  <!-- importmap: share a single React instance with @excalidraw/excalidraw -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react":              "https://esm.sh/react@18",
+      "react-dom":          "https://esm.sh/react-dom@18",
+      "react-dom/client":   "https://esm.sh/react-dom@18/client",
+      "@excalidraw/excalidraw": "https://esm.sh/@excalidraw/excalidraw?external=react,react-dom"
+    }
+  }
+  </script>
+</head>
+<body>
+<div id="root">
+  <div class="se-overlay" id="overlay">
+    <div class="se-spinner"></div>
+    <span class="se-label">Loading diagram…</span>
+  </div>
+</div>
+
+<script>
+// ── Phase 1: decode bundle from URL hash (pure JS, no dependencies) ──────────
+async function decodeBundle(b64url) {
+  // Restore URL-safe base64 → standard base64, re-add padding
+  const pad = b64url + '='.repeat((4 - b64url.length % 4) % 4);
+  const b64 = pad.replace(/-/g, '+').replace(/_/g, '/');
+  const binStr = atob(b64);
+  const bytes = new Uint8Array(binStr.length);
+  for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+
+  // Decompress using native browser DecompressionStream (no pako / fflate needed)
+  const ds = new DecompressionStream('gzip');
+  const writer = ds.writable.getWriter();
+  const reader = ds.readable.getReader();
+  writer.write(bytes);
+  writer.close();
+
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const total = chunks.reduce((n, c) => n + c.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  return JSON.parse(new TextDecoder().decode(out));
+}
+
+function setOverlay(html) {
+  const el = document.getElementById('overlay');
+  if (el) el.innerHTML = html;
+}
+function removeOverlay() {
+  const el = document.getElementById('overlay');
+  if (el) el.remove();
+}
+
+// Store decoded data for the module script to pick up
+window.__snowBundle = (async function() {
+  const hash = location.hash.slice(1);
+  if (!hash) return { error: 'no-hash' };
+  try {
+    return { bundle: await decodeBundle(hash) };
+  } catch (e) {
+    return { error: e.message };
+  }
+})();
+</script>
+
+<script type="module">
+import React         from 'react';
+import { createRoot } from 'react-dom/client';
+import { Excalidraw } from '@excalidraw/excalidraw';
+
+const { bundle, error } = await window.__snowBundle;
+
+if (!bundle) {
+  const detail = error === 'no-hash'
+    ? 'Open this page via <code>uv run python open.py diagram.excalidraw --mode edit</code>'
+    : `Decode failed: ${error}`;
+  setOverlay(`<div class="se-error"><h2>No diagram data</h2><p>${detail}</p></div>`);
+
+} else {
+  const diagram = bundle.diagram || bundle;
+
+  try {
+    removeOverlay();
+    const root = createRoot(document.getElementById('root'));
+    root.render(
+      React.createElement(Excalidraw, {
+        initialData: {
+          elements: diagram.elements  || [],
+          appState:  { ...(diagram.appState || {}), collaborators: new Map() },
+          files:     diagram.files    || {},
+        },
+      })
+    );
+  } catch (e) {
+    // CDN load succeeded but React render failed — offer .excalidraw download
+    const json = JSON.stringify(diagram, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    setOverlay(`
+      <div class="se-error">
+        <h2>Render error</h2>
+        <p>Excalidraw loaded but could not mount. Download the file and drag it to
+           <a href="https://excalidraw.com" target="_blank">excalidraw.com</a>.</p>
+        <a class="se-btn" href="${href}" download="diagram.excalidraw">Download .excalidraw</a>
+        <pre>${e.message}</pre>
+      </div>`);
+  }
+}
+</script>
+</body>
+</html>

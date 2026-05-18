@@ -57,6 +57,26 @@ Build elements in this order to avoid broken references:
 4. **Arrows** — created after all shapes they connect; reference `startBinding.elementId` and `endBinding.elementId`
 5. **Annotations** (free-floating text) — created last, no binding required
 
+**autoResize rule (mandatory):** Every text element whose `containerId` is non-null **must** include `"autoResize": true`. Omitting this causes text to be clipped or misaligned inside its container.
+
+```json
+// CORRECT — bound text inside a rectangle
+{
+  "type": "text",
+  "containerId": "rect-1",
+  "autoResize": true,
+  "textAlign": "center",
+  "verticalAlign": "middle"
+}
+
+// WRONG — bound text without autoResize
+{
+  "type": "text",
+  "containerId": "rect-1"
+  // missing autoResize!
+}
+```
+
 ---
 
 ## 2.5 Style Application

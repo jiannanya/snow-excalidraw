@@ -9,26 +9,29 @@ Use this guide to position elements on the canvas without guessing coordinates.
 - Origin: top-left `(0, 0)`
 - X increases rightward
 - Y increases downward
-- Default canvas size: **1400 × 900 px**
+- Default canvas size: **1800 × 1000 px**
 
 ---
 
 ## Standard Grid
 
-The canvas is divided into a 6-column × 7-row grid. Each cell is 220 × 120 px with 20 px gutters.
+The canvas is divided into a **6-column × 8-row** grid. Each cell is 240 × 110 px with 20 px gutters.
 
 ```
-Col →    C1      C2      C3      C4      C5      C6
+Col →    C1       C2       C3       C4       C5       C6
 Row ↓
-R1       80,80   300,80  520,80  740,80  960,80  1180,80
-R2       80,200  300,200 520,200 740,200 960,200 1180,200
-R3       80,320  300,320 520,320 740,320 960,320 1180,320
-R4       80,440  300,440 520,440 740,440 960,440 1180,440
-R5       80,560  300,560 520,560 740,560 960,560 1180,560
-R6       80,680  300,680 520,680 740,680 960,680 1180,680
-R7       80,800  300,800 520,800 740,800 960,800 1180,800
+R1       80,80    360,80   640,80   920,80   1200,80  1480,80
+R2       80,200   360,200  640,200  920,200  1200,200 1480,200
+R3       80,320   360,320  640,320  920,320  1200,320 1480,320
+R4       80,440   360,440  640,440  920,440  1200,440 1480,440
+R5       80,560   360,560  640,560  920,560  1200,560 1480,560
+R6       80,680   360,680  640,680  920,680  1200,680 1480,680
+R7       80,800   360,800  640,800  920,800  1200,800 1480,800
+R8       80,920   360,920  640,920  920,920  1200,920 1480,920
 ```
 
+**Column centres:** 80, 360, 640, 920, 1200, 1480  
+**Row tops:** 80, 200, 320, 440, 560, 680, 800, 920  
 **One top-level element per cell.** Bound text elements share their container's cell.
 
 ---
@@ -37,14 +40,14 @@ R7       80,800  300,800 520,800 740,800 960,800 1180,800
 
 | Element Type | Width | Height | Notes |
 |---|---|---|---|
-| Rectangle (standard) | 200 | 80 | Services, steps, screens |
-| Rectangle (tall, content) | 200 | 160 | Panels with multiple lines |
-| Rectangle (wide, header) | 420 | 60 | Section headers, full-width labels |
-| Ellipse (standard) | 160 | 80 | Actors, concepts |
+| Rectangle (standard) | 220 | 80 | Services, steps, screens |
+| Rectangle (tall, content) | 220 | 160 | Panels with multiple lines |
+| Rectangle (wide, header) | 460 | 60 | Section headers, full-width labels |
+| Ellipse (standard) | 180 | 80 | Actors, concepts |
 | Ellipse (circle) | 80 | 80 | Markers, nodes |
-| Diamond | 160 | 100 | Decision nodes |
-| Frame (small zone) | 420 | 300 | Groups 2-4 elements |
-| Frame (large zone) | 660 | 400 | Groups 5-8 elements |
+| Diamond | 180 | 100 | Decision nodes |
+| Frame (small zone) | 460 | 320 | Groups 2-4 elements |
+| Frame (large zone) | 700 | 440 | Groups 5-8 elements |
 
 ---
 
@@ -77,7 +80,7 @@ points = [[0, 0], [0, midY], [targetDeltaX, midY], [targetDeltaX, targetDeltaY]]
 
 ## Title Placement
 
-Always place the diagram title at `(80, 20)` with `width: 800, height: 30`.
+Always place the diagram title at `(80, 20)` with `width: 900, height: 30`.
 
 ```
 (80, 20)  ← Title text element always here

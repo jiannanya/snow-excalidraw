@@ -2,9 +2,10 @@
 name: snow-excalidraw
 description: >
   Generate precise, professional Excalidraw diagrams for any domain: system architecture,
-  data pipelines, product flows, concept maps, wireframes, timelines, and more.
+  data pipelines, product flows, concept maps, wireframes, timelines, UML sequence diagrams,
+  ER diagrams, kanban boards, sales funnels, and more.
   Supports multiple visual styles (sketch, blueprint, clean, dark). Delivers a live
-  hosted edit URL by default; PNG, animated SVG, and saved source on request.
+  edit URL by default (via local sites/ viewer); PNG, animated SVG, and saved source on request.
 ---
 
 Follow the execution pipeline in `./workflow.md`.
@@ -69,6 +70,35 @@ Full details in `./styles/`.
 | Comparison Frame | vs, trade-offs, options, before/after | `catalog/comparison-frame.md` |
 | Wireframe Kit | webpage, landing page, UI mockup, dashboard | `catalog/wireframe-kit.md` |
 | Narrative Flow | explain, teach, story, how it works | `catalog/narrative-flow.md` |
+| Sequence Diagram | UML sequence, API call flow, request/response | `catalog/sequence-diagram.md` |
+| ER Diagram | entity relationship, database schema, data model | `catalog/er-diagram.md` |
+| Kanban Board | kanban, sprint board, task board, WIP | `catalog/kanban.md` |
+| Sales Funnel | funnel, conversion, stages, marketing funnel | `catalog/sales-funnel.md` |
+
+## Viewer Pages (sites/)
+
+Self-contained local HTML pages for viewing and animating diagrams without a remote server:
+
+| Page | Purpose |
+|------|---------|
+| `sites/index.html` | Skill landing page and navigation |
+| `sites/audit.html` | Full Excalidraw editor (loads diagram from URL fragment) |
+| `sites/animate.html` | Step-by-step animation player with play/pause/step controls |
+
+URLs use a `file://` scheme with a gzip+base64 bundle in the fragment:  
+`file:///path/to/sites/audit.html#<encoded-bundle>`
+
+Use `scripts/open.py --mode edit` or `--mode animate` to auto-open the correct viewer.
+
+## Visual Guides (guides/)
+
+Additional design reference materials for agents:
+
+| Guide | Purpose |
+|-------|---------|
+| `guides/arrow-routing.md` | Arrow JSON anatomy, routing patterns, common mistakes |
+| `guides/patterns.md` | 10 reusable visual layout patterns with coordinate formulas |
+| `guides/prompt-templates.md` | Copy-ready prompt templates for each diagram type |
 
 ## Default Behavior
 

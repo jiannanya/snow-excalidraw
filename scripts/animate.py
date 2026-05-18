@@ -11,30 +11,19 @@ Usage:
 """
 
 import argparse
-import gzip
-import base64
 import json
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
-
-def encode_scene(data: dict) -> str:
-    raw = json.dumps(data, separators=(",", ":")).encode("utf-8")
-    compressed = gzip.compress(raw)
-    return base64.urlsafe_b64encode(compressed).decode("ascii")
+sys.path.insert(0, str(Path(__file__).parent))
+from scene_bundle import build_local_animate_url
 
 
 def render_via_playwright(excalidraw_path: Path, animseq_path: Path | None, output_path: Path) -> bool:
-    """Render animated SVG via Playwright using excalidraw-animate hosted service."""
-    data = json.loads(excalidraw_path.read_text(encoding="utf-8"))
-    payload = {"diagram": data}
-    if animseq_path and animseq_path.exists():
-        payload["animation"] = json.loads(animseq_path.read_text(encoding="utf-8"))
-
-    encoded = encode_scene(payload)
-    animate_url = f"https://excalidraw-animate.vercel.app/#json={encoded}"
+    """Render animated SVG via Playwright using the local sites/animate.html viewer."""
+    animate_url = build_local_animate_url(excalidraw_path, animseq_path)
 
     script = f"""
 import asyncio
@@ -76,18 +65,12 @@ asyncio.run(render())
 
 
 def write_animate_url_file(excalidraw_path: Path, animseq_path: Path | None, output_path: Path) -> None:
-    """Write a text file with the animation URL as a fallback."""
-    data = json.loads(excalidraw_path.read_text(encoding="utf-8"))
-    payload = {"diagram": data}
-    if animseq_path and animseq_path.exists():
-        payload["animation"] = json.loads(animseq_path.read_text(encoding="utf-8"))
-    encoded = encode_scene(payload)
-    url = f"https://excalidraw-animate.vercel.app/#json={encoded}"
-    
+    """Write a text file with the local animation URL as a fallback."""
+    animate_url = build_local_animate_url(excalidraw_path, animseq_path)
     url_file = output_path.with_suffix(".url.txt")
-    url_file.write_text(f"Animation URL:\n{url}\n", encoding="utf-8")
+    url_file.write_text(f"Animation URL:\n{animate_url}\n", encoding="utf-8")
     print(f"Animation URL saved to: {url_file}")
-    print(f"Open in browser: {url[:80]}...")
+    print(f"Open in browser: {animate_url[:80]}...")
 
 
 def main() -> None:

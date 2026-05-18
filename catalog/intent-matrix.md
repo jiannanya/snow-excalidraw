@@ -17,6 +17,10 @@ Use this table to select the correct diagram type from the user's request. Pick 
 | comparison, vs, trade-offs, options, pros/cons, before/after, alternatives | **Comparison Frame** | `catalog/comparison-frame.md` |
 | webpage, landing page, wireframe, dashboard, UI mockup, layout sketch | **Wireframe Kit** | `catalog/wireframe-kit.md` |
 | explain, teach, how it works, story, walkthrough, ELI5, overview | **Narrative Flow** | `catalog/narrative-flow.md` |
+| sequence diagram, UML sequence, message flow, API call chain, actor, lifeline | **Sequence Diagram** | `catalog/sequence-diagram.md` |
+| ER diagram, entity relationship, database schema, tables, foreign key, ORM model | **ER Diagram** | `catalog/er-diagram.md` |
+| kanban, task board, sprint board, work-in-progress, WIP, To Do / In Progress / Done | **Kanban Board** | `catalog/kanban.md` |
+| sales funnel, conversion rate, pipeline, MQL SQL, lead stages, AIDA, drop-off | **Sales Funnel** | `catalog/sales-funnel.md` |
 
 ---
 
@@ -59,5 +63,9 @@ Each diagram type has a natural default style. Override only when the user signa
 | Comparison Frame | `clean` | "sketch", "informal" |
 | Wireframe Kit | `sketch` | "clean", "high-fidelity" |
 | Narrative Flow | `sketch` | "clean", "presentation" |
+| Sequence Diagram | `clean` | "sketch", "rough" |
+| ER Diagram | `clean` | "blueprint", "sketch" |
+| Kanban Board | `clean` | "sketch", "informal" |
+| Sales Funnel | `clean` | "sketch", "bold" |
 
 Full style definitions in `./styles/index.md`.

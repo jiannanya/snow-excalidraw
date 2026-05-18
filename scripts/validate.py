@@ -14,6 +14,46 @@ import sys
 from pathlib import Path
 
 
+# ─────────────────────────────────────────────
+# Text overflow helpers
+# ─────────────────────────────────────────────
+
+def _estimate_text_px_width(text: str, font_size: float) -> float:
+    """Estimate the pixel width of the longest line in a text string.
+
+    Uses an average character width factor of 0.55 × font_size, which
+    approximates mixed-width latin text at Excalidraw's default font.
+    """
+    if not text:
+        return 0.0
+    longest = max(len(line) for line in text.split("\n"))
+    return longest * font_size * 0.55
+
+
+def check_text_overflow(elements: list[dict], id_map: dict[str, dict]) -> list[str]:
+    """Return warnings for bound text elements whose estimated width exceeds their container."""
+    warnings: list[str] = []
+    for el in elements:
+        if el.get("type") != "text":
+            continue
+        container_id = el.get("containerId")
+        if not container_id or container_id not in id_map:
+            continue
+        container = id_map[container_id]
+        container_w = container.get("width", 0)
+        font_size = el.get("fontSize", 16)
+        text = el.get("text", "")
+        available_w = max(0.0, float(container_w) - 20.0)  # 10px padding each side
+        estimated_w = _estimate_text_px_width(text, float(font_size))
+        if estimated_w > available_w:
+            warnings.append(
+                f"Text '{el.get('id')}' may overflow container '{container_id}': "
+                f"estimated {estimated_w:.0f}px > {available_w:.0f}px available "
+                f"(font {font_size}px, container width {container_w}px)"
+            )
+    return warnings
+
+
 def validate(path: str) -> list[str]:
     errors: list[str] = []
     file = Path(path)
@@ -122,6 +162,9 @@ def validate(path: str) -> list[str]:
         frame_id = el.get("frameId")
         if frame_id and frame_id not in id_map:
             errors.append(f"Element '{el_id}' has frameId='{frame_id}' which does not exist in elements")
+
+    # Text overflow check
+    errors.extend(check_text_overflow(elements, id_map))
 
     return errors
 
