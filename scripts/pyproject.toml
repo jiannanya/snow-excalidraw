@@ -1,0 +1,9 @@
+[project]
+name = "snow-excalidraw-scripts"
+version = "1.0.0"
+requires-python = ">=3.11"
+
+[project.dependencies]
+requests = ">=2.31.0"
+
+[tool.uv]

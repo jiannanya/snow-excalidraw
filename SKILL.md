@@ -1,0 +1,79 @@
+---
+name: snow-excalidraw
+description: >
+  Generate precise, professional Excalidraw diagrams for any domain: system architecture,
+  data pipelines, product flows, concept maps, wireframes, timelines, and more.
+  Supports multiple visual styles (sketch, blueprint, clean, dark). Delivers a live
+  hosted edit URL by default; PNG, animated SVG, and saved source on request.
+---
+
+Follow the execution pipeline in `./workflow.md`.
+
+Core references (always load):
+- `./catalog/intent-matrix.md` — maps user intent to diagram type
+- `./styles/index.md` — visual style selection
+- `./schema/spec.md` — Excalidraw JSON rules
+
+## Quick Start for Agents
+
+1. Read `./workflow.md` for the full 4-phase pipeline
+2. Identify diagram type from `./catalog/intent-matrix.md`
+3. Select visual style from `./styles/index.md`
+4. Load the matching catalog entry for detailed guidance
+5. Compose JSON using `./schema/element-recipes.md`
+6. Validate with `./scripts/validate.py`
+7. Deliver via `./scripts/open.py`
+
+## Rendering Tools
+
+### Preferred: Chrome DevTools MCP (fast, no Playwright)
+```
+npm install -g chrome-devtools-mcp
+```
+Add to Claude settings (`~/.claude/settings.json`):
+```json
+{
+  "mcpServers": {
+    "chrome-devtools-mcp": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp"]
+    }
+  }
+}
+```
+
+### Fallback: Playwright
+Used only when Chrome DevTools MCP is unavailable. Slower; requires browser installation.
+
+## Style System Summary
+
+| Style | When to Use | Key Visual Properties |
+|-------|-------------|----------------------|
+| `sketch` | Default; informal, creative, teaching | roughness=1, Virgil font, monochrome |
+| `blueprint` | Technical specs, infra diagrams | roughness=0, monospace, blue tones |
+| `clean` | Presentations, product docs | roughness=0, sharp lines, minimal color |
+| `dark` | Night-mode, dashboard backgrounds | dark canvas, light strokes |
+
+Full details in `./styles/`.
+
+## Diagram Catalog Summary
+
+| Category | Keywords | Guide |
+|----------|----------|-------|
+| System Design | architecture, infra, services, microservices | `catalog/system-design.md` |
+| Data Flow | pipeline, ETL, data movement, stream | `catalog/data-flow.md` |
+| Product Journey | user journey, checkout, onboarding, screen flow | `catalog/product-journey.md` |
+| Concept Web | mind map, concept map, cluster, ideas | `catalog/concept-web.md` |
+| Org Structure | org chart, team map, reporting lines | `catalog/org-structure.md` |
+| Timeline View | roadmap, sequence, chronology, milestones | `catalog/timeline-view.md` |
+| Comparison Frame | vs, trade-offs, options, before/after | `catalog/comparison-frame.md` |
+| Wireframe Kit | webpage, landing page, UI mockup, dashboard | `catalog/wireframe-kit.md` |
+| Narrative Flow | explain, teach, story, how it works | `catalog/narrative-flow.md` |
+
+## Default Behavior
+
+- Write diagram files to system temp directory; never write to user workspace unless asked
+- Always surface a hosted edit URL as the primary deliverable
+- Offer animation as an opt-in follow-up
+- Offer PNG only when user explicitly requests an image
+- Default style is `sketch` unless context indicates otherwise
