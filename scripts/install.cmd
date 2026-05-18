@@ -55,7 +55,7 @@ IF %ERRORLEVEL% NEQ 0 (
 echo.
 echo ================================================
 echo  Installation complete.
-echo  Usage:  uv run python open.py diagram.excalidraw --mode edit
+echo  Usage:  uv run python open.py diagram.excalidraw --mode audit
 echo ================================================
 echo.
 

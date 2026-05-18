@@ -14,7 +14,7 @@ uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode <mode>
 
 | Mode | Script Call | Result |
 |------|------------|--------|
-| `edit` | `--mode edit` | Writes `launch-edit.html`, opens browser at Excalidraw editor |
+| `audit` | `--mode audit` | Writes `launch-audit.html`, opens browser at Excalidraw editor |
 | `animate` | `--mode animate` | Writes `launch-animate.html`, opens browser at excalidraw-animate |
 | `save-excalidraw` | `--mode save-excalidraw --dest /project/dir` | Copies `.excalidraw` (and `.animseq.json`) to destination |
 | `save-image` | `--mode save-image --dest /project/dir` | Renders PNG to destination |
@@ -25,10 +25,10 @@ uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode <mode>
 
 ## 4.2 Default Mode Behavior
 
-When no explicit mode was identified in Phase 1, use `edit`:
+When no explicit mode was identified in Phase 1, use `audit`:
 
 ```bash
-uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode edit
+uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode audit
 ```
 
 This opens the diagram in Excalidraw where the user can make live edits.
@@ -50,11 +50,11 @@ If `diagram.excalidraw` does not exist at the expected path, write it first.
 
 After calling `open.py`, provide a brief handoff response to the user:
 
-**For edit mode:**
+**For audit mode:**
 ```
 Diagram opened in Excalidraw editor:
   File: /path/to/diagram.excalidraw
-  Launcher: /path/to/launch-edit.html
+  Launcher: /path/to/launch-audit.html
   Elements: N
 
 [Brief description of what the diagram shows]
@@ -83,8 +83,8 @@ Diagram saved to:
 
 End the handoff with at most two follow-up offers. Choose the most relevant:
 
-- "Add animation sequence?" (if mode was `edit` and diagram has multiple stages)
-- "Export as PNG?" (if mode was `edit` and diagram is finished)
+- "Add animation sequence?" (if mode was `audit` and diagram has multiple stages)
+- "Export as PNG?" (if mode was `audit` and diagram is finished)
 - "Add a detail view for [sub-system]?" (if diagram shows a complex sub-system)
 - "Switch to dark style?" (if diagram is for a dark-mode presentation)
 
@@ -102,7 +102,26 @@ After successful delivery:
 
 ---
 
-## 4.7 Failure Recovery
+## 4.7 E2E Browser Validation (Optional)
+
+To verify the launcher renders correctly in a real browser, run `e2e_test.py`:
+
+```bash
+uv run python e2e_test.py /path/to/launch-audit.html
+```
+
+This requires `playwright` to be installed (`uv pip install playwright && uv run playwright install chromium`).  
+If playwright is not available, the test is skipped with a warning — delivery continues normally.
+
+Alternatively, pass `--e2e` to `open.py` in `html-preview` mode:
+
+```bash
+uv run python open.py diagram.excalidraw --mode html-preview --e2e
+```
+
+---
+
+## 4.8 Failure Recovery
 
 If `open.py` fails or the browser does not open:
 

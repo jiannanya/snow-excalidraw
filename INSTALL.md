@@ -86,12 +86,13 @@ All scripts are in `scripts/` and invoked via `uv run`:
 
 | Command | Description |
 |---------|-------------|
-| `uv run python open.py diagram.excalidraw --mode edit` | Open in local browser editor |
+| `uv run python open.py diagram.excalidraw --mode audit` | Open in local browser editor |
 | `uv run python open.py diagram.excalidraw --mode animate` | Open animation player |
 | `uv run python open.py diagram.excalidraw --mode save-image --dest ./out` | Render PNG to `./out/` |
 | `uv run python open.py diagram.excalidraw --mode save-animation --dest ./out` | Save animated SVG |
 | `uv run python validate.py diagram.excalidraw` | Validate diagram JSON |
 | `uv run python render.py diagram.excalidraw output.png` | Render PNG directly |
+| `uv run python e2e_test.py launch-audit.html` | Browser e2e validation of launcher page |
 
 ### Running tests
 
@@ -104,7 +105,7 @@ uv run pytest tests/ -v
 
 ## Viewer Pages (sites/)
 
-The `sites/` directory contains self-contained HTML pages. They load Excalidraw from the `esm.sh` CDN, so **an internet connection is required** for the first render.
+The `sites/` directory contains self-contained HTML pages. They load Excalidraw from the `jsDelivr` CDN, so **an internet connection is required** for the first render.
 
 | Page | Description |
 |------|-------------|

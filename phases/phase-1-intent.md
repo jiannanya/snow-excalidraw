@@ -76,13 +76,13 @@ Infer the intended delivery mode from the user's message:
 
 | User Signal | Mode |
 |-------------|------|
-| "edit", "I'll adjust it", "let me tweak" | `edit` |
+| "edit", "I'll adjust it", "let me tweak" | `audit` |
 | "animate", "show step by step", "presentation" | `animate` |
 | "save", "keep a copy", "export file" | `save-excalidraw` |
 | "image", "PNG", "screenshot", "share" | `save-image` |
 | "open", "show me" | `open-image` |
 | "animated SVG", "animated export" | `save-animation` |
-| No signal | `edit` (default) |
+| No signal | `audit` (default) |
 
 ---
 
@@ -94,7 +94,7 @@ Before composing, list the elements that will appear in the diagram:
 INTENT SUMMARY
   Type:      System Design
   Style:     blueprint
-  Mode:      edit
+  Mode:      audit
   Subject:   user login request flow
   Components:
     - Browser (actor)

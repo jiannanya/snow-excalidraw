@@ -45,16 +45,16 @@ Run Python scripts via the terminal tool:
 
 ```bash
 uv run python {SKILL_ROOT}/scripts/validate.py /path/to/diagram.excalidraw
-uv run python {SKILL_ROOT}/scripts/open.py /path/to/diagram.excalidraw --mode edit
+uv run python {SKILL_ROOT}/scripts/open.py /path/to/diagram.excalidraw --mode audit
 ```
 
 Replace `{SKILL_ROOT}` with the actual path.
 
 ### Browser Tool
-When `open.py` creates a `launch-edit.html` or `launch-animate.html`, open it in the browser using the browser tool if available:
+When `open.py` creates a `launch-audit.html` or `launch-animate.html`, open it in the browser using the browser tool if available:
 
 ```
-open_browser_page("file:///path/to/launch-edit.html")
+open_browser_page("file:///path/to/launch-audit.html")
 ```
 
 ---

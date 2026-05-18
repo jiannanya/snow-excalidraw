@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Snow-Excalidraw — Animation Player</title>
-  <link rel="stylesheet" href="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/excalidraw.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
@@ -54,16 +54,7 @@
     .se-error p  { color: #495057; font-size: .9rem; line-height: 1.6; }
   </style>
 
-  <script type="importmap">
-  {
-    "imports": {
-      "react":            "https://esm.sh/react@18",
-      "react-dom":        "https://esm.sh/react-dom@18",
-      "react-dom/client": "https://esm.sh/react-dom@18/client",
-      "@excalidraw/excalidraw": "https://esm.sh/@excalidraw/excalidraw?external=react,react-dom"
-    }
-  }
-  </script>
+
 </head>
 <body>
 
@@ -90,6 +81,28 @@
 </div>
 
 <script>
+// ── Bundle encoder (gzip+base64url, no external deps) ────────────────────────
+async function encodeBundle(payload) {
+  const raw = new TextEncoder().encode(JSON.stringify(payload));
+  const cs = new CompressionStream('gzip');
+  const writer = cs.writable.getWriter();
+  const reader = cs.readable.getReader();
+  writer.write(raw);
+  writer.close();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const out = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0));
+  let off = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  let bin = '';
+  for (let i = 0; i < out.length; i++) bin += String.fromCharCode(out[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
 // ── Bundle decoder (no external deps) ─────────────────────────────────────────
 async function decodeBundle(b64url) {
   const pad = b64url + '='.repeat((4 - b64url.length % 4) % 4);
@@ -168,18 +181,40 @@ function showOverlayError(html) {
 window.__snowReady.then(function(result) {
   if (result.error === 'no-hash') {
     showOverlayError(
-      '<div class="se-error"><h2>No animation data</h2>' +
-      '<p>Generate a preview with:<br>' +
+      '<div class="se-error"><h2>Load a diagram</h2>' +
+      '<p>Select a <code>.excalidraw</code> file to animate:</p>' +
+      '<label style="font-size:12px;color:#495057">Diagram:<br>' +
+      '<input id="se-file-diagram" type="file" accept=".excalidraw,.json" style="margin:.3rem 0 .6rem;font-size:13px"></label>' +
+      '<label style="font-size:12px;color:#495057">Animation sequence (optional):<br>' +
+      '<input id="se-file-anim" type="file" accept=".json" style="margin:.3rem 0 .6rem;font-size:13px"></label>' +
+      '<button id="se-load-btn" class="ctrl-btn" style="margin-top:.4rem">Load &amp; Play</button>' +
+      '<p style="margin-top:.8rem;font-size:.85rem;color:#868e96">Or generate via:<br>' +
       '<code>uv run python open.py diagram.excalidraw --mode animate</code></p>' +
       '</div>'
     );
+    document.getElementById('se-load-btn').addEventListener('click', async function() {
+      const dFile = document.getElementById('se-file-diagram').files[0];
+      if (!dFile) { alert('Please select a .excalidraw file.'); return; }
+      try {
+        const diagram = JSON.parse(await dFile.text());
+        const bundle = { diagram };
+        const aFile = document.getElementById('se-file-anim').files[0];
+        if (aFile) bundle.animation = JSON.parse(await aFile.text());
+        const hash = await encodeBundle(bundle);
+        location.hash = hash;
+        location.reload();
+      } catch (e) {
+        showOverlayError('<div class="se-error"><h2>Invalid file</h2><p>' +
+          (e && (e.message || String(e))) + '</p></div>');
+      }
+    });
     return;
   }
   window.__seCdnWatchdog = setTimeout(function() {
     if (!window.__seModuleMounted) {
       showOverlayError(
         '<div class="se-error"><h2>CDN load timed out</h2>' +
-        '<p>Could not load Excalidraw from <code>esm.sh</code> after 20 s.</p>' +
+        '<p>Could not load Excalidraw from <code>jsDelivr</code> after 20 s.</p>' +
         '<ul style="text-align:left;margin-top:.5rem;font-size:.85rem;color:#495057">' +
         '<li>Check your internet connection and reload.</li>' +
         '<li>Or open <a href="https://excalidraw.com" target="_blank">excalidraw.com</a> directly.</li>' +
@@ -204,9 +239,9 @@ window.addEventListener('unhandledrejection', function(ev) {
 </script>
 
 <script type="module">
-import React         from 'react';
-import { createRoot } from 'react-dom/client';
-import { Excalidraw } from '@excalidraw/excalidraw';
+import React         from 'https://cdn.jsdelivr.net/npm/react@18/+esm';
+import { createRoot } from 'https://cdn.jsdelivr.net/npm/react-dom@18/+esm';
+import { Excalidraw } from 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/+esm';
 
 // Signal to pre-flight watchdog that ESM imports succeeded.
 window.__seModuleMounted = true;

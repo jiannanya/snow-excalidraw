@@ -171,7 +171,7 @@ Types covered: System Design, Data Flow, Product Journey, Concept Web, Org Struc
 
 **validate.py:** Complete structural validator. Checks: file existence, JSON parse, type/version fields, non-empty elements, unique IDs, no isDeleted:true, text content not empty, containerId resolution, boundElements resolution, arrow startBinding/endBinding resolution, arrow minimum 2 points, frameId resolution, off-canvas elements, stacking at identical coordinates. Exits 0 on success.
 
-**open.py:** Diagram launcher and exporter. Supports all 6 delivery modes. Encodes scenes with gzip+base64 for URL sharing. Writes `launch-edit.html` and `launch-animate.html`. Calls `render.py` and `animate.py` for image/animation modes. Falls back gracefully when rendering unavailable.
+**open.py:** Diagram launcher and exporter. Supports all 6 delivery modes. Encodes scenes with gzip+base64 for URL sharing. Writes `launch-audit.html` and `launch-animate.html`. Calls `render.py` and `animate.py` for image/animation modes. Falls back gracefully when rendering unavailable.
 
 **render.py:** PNG renderer via Playwright. Loads diagram URL in headless Chromium and captures screenshot.
 

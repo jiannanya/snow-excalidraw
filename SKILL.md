@@ -6,6 +6,7 @@ description: >
   ER diagrams, kanban boards, sales funnels, and more.
   Supports multiple visual styles (sketch, blueprint, clean, dark). Delivers a live
   edit URL by default (via local sites/ viewer); PNG, animated SVG, and saved source on request.
+  Uses the `audit` delivery mode by default (opens `sites/audit.html`).
 ---
 
 Follow the execution pipeline in `./workflow.md`.
@@ -82,13 +83,13 @@ Self-contained local HTML pages for viewing and animating diagrams without a rem
 | Page | Purpose |
 |------|---------|
 | `sites/index.html` | Skill landing page and navigation |
-| `sites/audit.html` | Full Excalidraw editor (loads diagram from URL fragment) |
+| `sites/audit.html` | Full Excalidraw editor — loads diagram from URL fragment or local file picker |
 | `sites/animate.html` | Step-by-step animation player with play/pause/step controls |
 
 URLs use a `file://` scheme with a gzip+base64 bundle in the fragment:  
 `file:///path/to/sites/audit.html#<encoded-bundle>`
 
-Use `scripts/open.py --mode edit` or `--mode animate` to auto-open the correct viewer.
+Use `scripts/open.py --mode audit` or `--mode animate` to auto-open the correct viewer.
 
 ## Visual Guides (guides/)
 

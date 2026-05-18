@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Snow-Excalidraw — Editor</title>
+  <title>Snow-Excalidraw — Audit</title>
   <!-- Excalidraw stylesheet loaded from CDN -->
-  <link rel="stylesheet" href="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/excalidraw.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
@@ -41,17 +41,7 @@
     .se-btn:hover { background: #228be6; }
   </style>
 
-  <!-- importmap: share a single React instance with @excalidraw/excalidraw -->
-  <script type="importmap">
-  {
-    "imports": {
-      "react":              "https://esm.sh/react@18",
-      "react-dom":          "https://esm.sh/react-dom@18",
-      "react-dom/client":   "https://esm.sh/react-dom@18/client",
-      "@excalidraw/excalidraw": "https://esm.sh/@excalidraw/excalidraw?external=react,react-dom"
-    }
-  }
-  </script>
+
 </head>
 <body>
 <div id="root">
@@ -118,11 +108,30 @@ window.__seModuleMounted = false;
 window.__snowBundle.then(function(result) {
   if (result.error === 'no-hash') {
     setOverlay(
-      '<div class="se-error"><h2>No diagram data</h2>' +
-      '<p>Generate a standalone preview with:<br>' +
-      '<code>uv run python open.py diagram.excalidraw --mode html-preview</code></p>' +
+      '<div class="se-error"><h2>Load a diagram</h2>' +
+      '<p>Select a local <code>.excalidraw</code> file to open in the editor:</p>' +
+      '<input id="se-local-file" type="file" accept=".excalidraw,.json" style="margin-top:.6rem;font-size:13px">' +
+      '<p style="margin-top:.8rem;font-size:.85rem;color:#868e96">Or generate via:<br>' +
+      '<code>uv run python open.py diagram.excalidraw --mode audit</code></p>' +
       '</div>'
     );
+    const input = document.getElementById('se-local-file');
+    if (input) {
+      input.addEventListener('change', async function() {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const diagram = JSON.parse(text);
+          const hash = await encodeBundle({ diagram });
+          location.hash = hash;
+          location.reload();
+        } catch (e) {
+          setOverlay('<div class="se-error"><h2>Invalid file</h2><p>' +
+            (e && (e.message || String(e))) + '</p></div>');
+        }
+      });
+    }
     return;
   }
   // Hash present — arm CDN watchdog: if ESM imports never resolve, show error.
@@ -130,7 +139,7 @@ window.__snowBundle.then(function(result) {
     if (!window.__seModuleMounted) {
       setOverlay(
         '<div class="se-error"><h2>CDN load timed out</h2>' +
-        '<p>Could not load Excalidraw from <code>esm.sh</code> after 20 s.</p>' +
+        '<p>Could not load Excalidraw from <code>jsDelivr</code> after 20 s.</p>' +
         '<ul style="text-align:left;margin-top:.5rem;font-size:.85rem;color:#495057">' +
         '<li>Check your internet connection and reload.</li>' +
         '<li>Or drag the <code>.excalidraw</code> file onto ' +
@@ -149,7 +158,7 @@ window.addEventListener('unhandledrejection', function(ev) {
   setOverlay(
     '<div class="se-error"><h2>Module load error</h2>' +
     '<p>' + msg + '</p>' +
-    '<p style="margin-top:.5rem">Check internet connection or open ' +
+        '<p style="margin-top:.5rem">Check internet or open ' +
     '<a href="https://excalidraw.com" target="_blank">excalidraw.com</a> directly.</p>' +
     '</div>'
   );
@@ -157,9 +166,9 @@ window.addEventListener('unhandledrejection', function(ev) {
 </script>
 
 <script type="module">
-import React         from 'react';
-import { createRoot } from 'react-dom/client';
-import { Excalidraw } from '@excalidraw/excalidraw';
+import React         from 'https://cdn.jsdelivr.net/npm/react@18/+esm';
+import { createRoot } from 'https://cdn.jsdelivr.net/npm/react-dom@18/+esm';
+import { Excalidraw } from 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/+esm';
 
 // Signal to pre-flight watchdog that ESM imports succeeded.
 window.__seModuleMounted = true;
@@ -169,7 +178,7 @@ const { bundle, error } = await window.__snowBundle;
 
 if (!bundle) {
   const detail = error === 'no-hash'
-    ? 'Open this page via <code>uv run python open.py diagram.excalidraw --mode edit</code>'
+    ? 'Open this page via <code>uv run python open.py diagram.excalidraw --mode audit</code>'
     : `Decode failed: ${error}`;
   setOverlay(`<div class="se-error"><h2>No diagram data</h2><p>${detail}</p></div>`);
 

@@ -53,6 +53,6 @@ fi
 echo ""
 echo "================================================"
 echo " Installation complete."
-echo " Usage:  uv run python open.py diagram.excalidraw --mode edit"
+echo " Usage:  uv run python open.py diagram.excalidraw --mode audit"
 echo "================================================"
 echo ""

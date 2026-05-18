@@ -192,14 +192,14 @@ Call `scripts/open.py` with the correct delivery mode, provide a handoff summary
 
 | Mode | What Happens |
 |------|-------------|
-| `edit` | Opens diagram in local `sites/audit.html` viewer (default) |
+| `audit` | Opens diagram in local `sites/audit.html` viewer (default) |
 | `animate` | Opens diagram in local `sites/animate.html` step-by-step player |
 | `save-excalidraw` | Copies `.excalidraw` and `.animseq.json` to a destination directory |
 | `save-image` | Renders PNG to destination directory via Playwright |
 | `open-image` | Renders PNG and opens with system image viewer |
 | `save-animation` | Renders animated SVG to destination directory |
 
-The `edit` and `animate` modes construct a `file://` URL pointing to the local `sites/` viewer page, with the diagram bundle encoded in the URL fragment. No server needs to be running for these modes.
+The `audit` and `animate` modes construct a `file://` URL pointing to the local `sites/` viewer page, with the diagram bundle encoded in the URL fragment. No server needs to be running for these modes.
 
 ---
 
@@ -248,7 +248,7 @@ Exits 0 on success, non-zero with error list on failure.
 Opens or exports a diagram in the specified delivery mode.
 
 ```bash
-uv run python scripts/open.py /path/to/diagram.excalidraw --mode edit
+uv run python scripts/open.py /path/to/diagram.excalidraw --mode audit
 uv run python scripts/open.py /path/to/diagram.excalidraw --mode animate
 uv run python scripts/open.py /path/to/diagram.excalidraw --mode save-image --dest /project/dir
 ```

@@ -89,7 +89,7 @@ uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode <MODE> [--de
 
 | User Request | `--mode` | What Happens |
 |---|---|---|
-| Default / "show me" / "open" / no explicit format | `edit` | Writes `launch-edit.html` → redirects to hosted Excalidraw editor |
+| Default / "show me" / "open" / no explicit format | `audit` | Writes `launch-audit.html` → opens standalone Excalidraw editor |
 | "watch it animate" / "open animation" / "show animated" | `animate` | Writes `launch-animate.html` → redirects to hosted animation view |
 | "save the diagram" / "keep the source" / "save as excalidraw" | `save-excalidraw` | Copies `.excalidraw` (+ `.animseq.json` if present) to `--dest` |
 | "animated SVG" / "save animation" / "video" | `save-animation` | Renders + saves `.animated.svg` to `--dest` (always workspace) |
@@ -104,14 +104,14 @@ uv run python open.py "/absolute/path/to/diagram.excalidraw" --mode <MODE> [--de
 ### Handoff
 
 Every response must include **one** of:
-- A `file://` path to the launcher HTML (edit / animate modes)
+- A `file://` path to the launcher HTML (audit / animate modes)
 - The absolute path to the saved output file (save-* / open-image modes)
 
 A response with no path or link is incomplete.
 
 ### Follow-up Offers (deliver after handoff, contextually)
 
-- If mode was `edit` and user hasn't asked for animation:
+- If mode was `audit` and user hasn't asked for animation:
   > "Want to see it draw itself? I can generate an animated version."
 - If source file is still in temp and user hasn't asked to save it:
   > "Want me to save the source file to your project folder?"
@@ -133,7 +133,7 @@ diagram.excalidraw          — main diagram source
 diagram.animseq.json        — animation sequence (optional)
 diagram.animated.svg        — rendered animation output
 diagram.png                 — rendered static image
-launch-edit.html            — browser launcher for edit mode
+launch-audit.html            — browser launcher for audit mode
 launch-animate.html         — browser launcher for animate mode
 ```
 

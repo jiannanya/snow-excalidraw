@@ -72,7 +72,7 @@ A diagram that fails validation must not be delivered. Fix all errors and re-val
 |------|------|
 | Main diagram | `diagram.excalidraw` |
 | Animation sequence | `diagram.animseq.json` |
-| Edit launcher | `launch-edit.html` |
+| Audit launcher | `launch-audit.html` |
 | Animate launcher | `launch-animate.html` |
 | Rendered PNG | `diagram.png` |
 | Animated SVG | `diagram.animated.svg` |
@@ -105,9 +105,9 @@ User keywords `"sketch"`, `"blueprint"`, `"clean"`, `"dark"` override defaults.
 
 ## Delivery Mode Defaults
 
-Default mode when not specified: `edit`
+Default mode when not specified: `audit`
 
-All modes: `edit`, `animate`, `save-excalidraw`, `save-image`, `open-image`, `save-animation`
+All modes: `audit`, `animate`, `save-excalidraw`, `save-image`, `open-image`, `save-animation`
 
 ---
 
@@ -141,9 +141,12 @@ All scripts use `uv run python`:
 
 ```bash
 uv run python scripts/validate.py diagram.excalidraw
-uv run python scripts/open.py diagram.excalidraw --mode edit
+uv run python scripts/open.py diagram.excalidraw --mode audit
 uv run python scripts/render.py diagram.excalidraw diagram.png
 uv run python scripts/animate.py diagram.excalidraw diagram.animated.svg
+uv run python scripts/e2e_test.py launch-audit.html
 ```
+
+`e2e_test.py` runs a headless Playwright browser check to confirm a launcher page renders (overlay disappears, canvas mounts). Requires `playwright` — skips gracefully if not installed.
 
 Scripts do not require a virtualenv — `uv` manages dependencies automatically.

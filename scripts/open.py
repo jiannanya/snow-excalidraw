@@ -6,7 +6,7 @@ Encodes diagrams via scene_bundle.py and opens them in the local sites/ viewers.
 Handles edit, animate, save-excalidraw, save-animation, save-image, open-image modes.
 
 Usage:
-    uv run python open.py /path/to/diagram.excalidraw --mode edit
+    uv run python open.py /path/to/diagram.excalidraw --mode audit
     uv run python open.py /path/to/diagram.excalidraw --mode animate
     uv run python open.py /path/to/diagram.excalidraw --mode save-excalidraw --dest /project/dir
     uv run python open.py /path/to/diagram.excalidraw --mode save-image --dest /project/dir
@@ -166,7 +166,7 @@ def main() -> None:
     parser.add_argument("diagram", help="Path to .excalidraw file")
     parser.add_argument(
         "--mode",
-        choices=["html-preview", "edit", "animate", "save-excalidraw", "save-image", "open-image", "save-animation"],
+        choices=["html-preview", "audit", "animate", "save-excalidraw", "save-image", "open-image", "save-animation"],
         default="html-preview",
         help="Delivery mode (default: html-preview)",
     )
@@ -209,9 +209,9 @@ def main() -> None:
                 print("E2E test FAILED \u2014 review errors above.", file=sys.stderr)
                 sys.exit(result.returncode)
 
-    elif mode == "edit":
+    elif mode == "audit":
         standalone_html = build_standalone_html(diagram_path)
-        launcher = diagram_dir / "launch-edit.html"
+        launcher = diagram_dir / "launch-audit.html"
         launcher.write_text(standalone_html, encoding="utf-8")
         print(f"Launcher : {launcher}")
         print(f"URL      : {launcher.as_uri()}")
@@ -240,7 +240,7 @@ def main() -> None:
             print(f"Saved: {result}")
         else:
             standalone_html = build_standalone_html(diagram_path)
-            launcher = diagram_dir / "launch-edit.html"
+            launcher = diagram_dir / "launch-audit.html"
             launcher.write_text(standalone_html, encoding="utf-8")
             print(f"PNG unavailable. Open editor to export: {launcher}")
             open_in_browser(launcher)
@@ -252,7 +252,7 @@ def main() -> None:
             open_with_system(result)
         else:
             standalone_html = build_standalone_html(diagram_path)
-            launcher = diagram_dir / "launch-edit.html"
+            launcher = diagram_dir / "launch-audit.html"
             launcher.write_text(standalone_html, encoding="utf-8")
             print(f"PNG unavailable. Open editor to export: {launcher}")
             open_in_browser(launcher)
