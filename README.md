@@ -377,25 +377,6 @@ snow-excalidraw/
 
 ---
 
-## Differences from Other Diagram Skills
-
-| Capability | Snow-Excalidraw | Typical single-style skill |
-|------------|----------------|---------------------------|
-| Visual styles | 4 (sketch, blueprint, clean, dark) | 1 |
-| Diagram types | 13 | 8 or fewer |
-| Component library | Yes (6 component files) | None |
-| Structural validation | Yes (validate.py + text overflow) | None |
-| Delivery modes | 6 | 2–3 |
-| Dark mode | Yes | No |
-| Animation sequences | `.animseq.json` with per-element order | Basic or none |
-| Self-hosted viewer | Yes (`sites/` pages, no server needed) | No |
-| Evidence artifacts | Required for technical diagrams | Optional |
-| Phase pipeline | 4 phases | 3 steps or fewer |
-| Composition rules | Explicit (composition-rules.md) | Implicit |
-| Unit tests | Yes (tests/) | No |
-
----
-
 ## License
 
 This skill is part of the snow-skill collection. See `LICENSE` for usage terms.
