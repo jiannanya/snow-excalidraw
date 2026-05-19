@@ -91,7 +91,7 @@ All elements share these properties:
 | `text` | string | Displayed text (may be wrapped) |
 | `originalText` | string | Source text (unwrapped) |
 | `fontSize` | number | Size in px; see style guides |
-| `fontFamily` | number | `1`=Virgil, `2`=Helvetica, `3`=Cascadia Code |
+| `fontFamily` | number | `5`=Excalifont (**default for sketch**), `1`=Virgil (legacy), `2`=Helvetica, `3`=Cascadia Code |
 | `textAlign` | string | `"left"`, `"center"`, `"right"` |
 | `verticalAlign` | string | `"top"`, `"middle"`, `"bottom"` |
 | `containerId` | string\|null | ID of parent shape if bound |

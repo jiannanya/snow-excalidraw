@@ -85,7 +85,7 @@ Apply style properties from `../styles/<chosen-style>.md` to every element:
 
 | Style | roughness | fontFamily | strokeColor |
 |-------|-----------|------------|-------------|
-| sketch | 1 | 1 (Virgil) | #1e1e1e |
+| sketch | 1 | 5 (Excalifont) | #1e1e1e |
 | blueprint | 0 | 3 (Cascadia) | #1864ab |
 | clean | 0 | 2 (Helvetica) | #212529 |
 | dark | 0 | 2 (Helvetica) | #dee2e6 |
@@ -168,7 +168,7 @@ Every diagram includes a title. Place it at approximately (80, 20):
   "height": 40,
   "text": "Diagram Title",
   "fontSize": 28,
-  "fontFamily": 1,
+  "fontFamily": 5,
   "textAlign": "left",
   "verticalAlign": "top",
   "strokeColor": "#1e1e1e",
@@ -197,6 +197,32 @@ Wrap all elements in the required Excalidraw file envelope:
 ```
 
 For dark style: `"viewBackgroundColor": "#1a1b1e"`
+
+---
+
+## 2.12 JSON Output Format
+
+**MANDATORY:** Write the `.excalidraw` file with 2-space indentation, **one property per line**. Never compress multiple properties onto a single line.
+
+Correct (matches `json.dumps(data, indent=2, ensure_ascii=False)`):
+```json
+{
+  "type": "text",
+  "id": "txt-title",
+  "x": 80,
+  "y": 20,
+  "width": 400,
+  "height": 30,
+  "fontFamily": 5
+}
+```
+
+Wrong (compact multi-property lines — do NOT do this):
+```json
+{"type": "text", "id": "txt-title", "x": 80, "y": 20,
+ "seed": 10001, "version": 1, "versionNonce": 1010001,
+ "isDeleted": false, "groupIds": [], "frameId": null}
+```
 
 ---
 

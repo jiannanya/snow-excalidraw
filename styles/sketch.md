@@ -1,6 +1,6 @@
 # Sketch Style
 
-The default style for most diagrams. Rough, hand-drawn, and organic. Uses the Virgil handwriting font for a sketch aesthetic.
+The default style for most diagrams. Rough, hand-drawn, and organic. Uses Excalifont (the built-in hand-drawn font) for a sketch aesthetic.
 
 ---
 
@@ -15,7 +15,7 @@ The default style for most diagrams. Rough, hand-drawn, and organic. Uses the Vi
 | `strokeStyle` | `"solid"` | Use `"dashed"` for secondary/optional elements |
 | `roughness` | `1` | Always 1 for sketch style |
 | `opacity` | `100` | |
-| `fontFamily` | `1` | Virgil handwritten font |
+| `fontFamily` | `5` | Excalifont (built-in hand-drawn font) |
 | `fontSize` | `16` (body), `20` (heading) | |
 | Canvas background | `#ffffff` | White canvas |
 
@@ -38,7 +38,7 @@ Use at most **one accent fill per diagram**. Do not use fills for decoration.
 
 ## Typography
 
-All text uses Virgil (fontFamily: 1) in sketch style.
+All text uses Excalifont (fontFamily: 5) in sketch style.
 
 | Text Role | fontSize | Notes |
 |-----------|----------|-------|

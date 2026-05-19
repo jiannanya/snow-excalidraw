@@ -25,16 +25,23 @@ All recipes use **sketch style** defaults. For blueprint/clean/dark styles, adju
   "text": "Diagram Title",
   "originalText": "Diagram Title",
   "fontSize": 24,
-  "fontFamily": 1,
+  "fontFamily": 5,
   "textAlign": "left",
   "verticalAlign": "top",
   "containerId": null,
   "autoResize": true,
   "lineHeight": 1.25,
-  "seed": 10001, "version": 1, "versionNonce": 1010001,
-  "isDeleted": false, "groupIds": [], "frameId": null,
-  "boundElements": null, "updated": 1700000000000,
-  "link": null, "locked": false, "index": null
+  "seed": 10001,
+  "version": 1,
+  "versionNonce": 1010001,
+  "isDeleted": false,
+  "groupIds": [],
+  "frameId": null,
+  "boundElements": null,
+  "updated": 1700000000000,
+  "link": null,
+  "locked": false,
+  "index": null
 }
 ```
 
@@ -56,10 +63,17 @@ All recipes use **sketch style** defaults. For blueprint/clean/dark styles, adju
   "strokeStyle": "solid",
   "roughness": 1,
   "opacity": 100,
-  "seed": 10002, "version": 1, "versionNonce": 1010002,
-  "isDeleted": false, "groupIds": [], "frameId": null,
+  "seed": 10002,
+  "version": 1,
+  "versionNonce": 1010002,
+  "isDeleted": false,
+  "groupIds": [],
+  "frameId": null,
   "boundElements": [{"id": "txt-step-1", "type": "text"}],
-  "updated": 1700000000000, "link": null, "locked": false, "index": null
+  "updated": 1700000000000,
+  "link": null,
+  "locked": false,
+  "index": null
 }
 ```
 
@@ -84,16 +98,23 @@ All recipes use **sketch style** defaults. For blueprint/clean/dark styles, adju
   "text": "Step Name",
   "originalText": "Step Name",
   "fontSize": 16,
-  "fontFamily": 1,
+  "fontFamily": 5,
   "textAlign": "center",
   "verticalAlign": "middle",
   "containerId": "rect-step-1",
   "autoResize": true,
   "lineHeight": 1.25,
-  "seed": 10003, "version": 1, "versionNonce": 1010003,
-  "isDeleted": false, "groupIds": [], "frameId": null,
-  "boundElements": null, "updated": 1700000000000,
-  "link": null, "locked": false, "index": null
+  "seed": 10003,
+  "version": 1,
+  "versionNonce": 1010003,
+  "isDeleted": false,
+  "groupIds": [],
+  "frameId": null,
+  "boundElements": null,
+  "updated": 1700000000000,
+  "link": null,
+  "locked": false,
+  "index": null
 }
 ```
 
